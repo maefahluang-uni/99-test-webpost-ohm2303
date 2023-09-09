@@ -23,34 +23,52 @@ public class PostController {
     PostRepository postRepository;
 
     // TODO: get all Posts
+    @GetMapping("/posts")
     public ResponseEntity<List<Post>> getPosts() {
-        return null;
+        return ResponseEntity.ok().body(postRepository.findAll());
     }
 
     //TODO: getting post by id
-    public ResponseEntity<Post> getPostById( Long id) {
+    @GetMapping("/posts/{id}")
+    public ResponseEntity getPostById(@PathVariable Long id) {
         // TODO: check if post is null
-        return null;
+        Optional<Post> posts = postRepository.findById(id);
+        if(!posts.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+        }
+        return ResponseEntity.ok().body(posts);
     }
 
     //TODO: find by title
-    public ResponseEntity<List<Post>> getPostByTitle( String title) {
-        return null;
+    @GetMapping("/posts/title/{title}")
+    public ResponseEntity<List<Post>> getPostByTitle(@PathVariable String title) {
+        List<Post> posts = postRepository.findByTitle(title);
+        return ResponseEntity.ok().body(posts);
     }
 
     // TODO: adding new post
-    public ResponseEntity<String> addPost( Post post) {
-        return null;
+    @PostMapping("/posts")
+    public ResponseEntity<String> addPost(@RequestBody Post post) {
+        postRepository.save(post);
+        return ResponseEntity.status(HttpStatus.CREATED).body("created");
     }
 
     // TODO: delete post by id
-    public ResponseEntity<String> deletePost( Long id) {
-        return null;
+    @DeleteMapping("/posts/{id}")
+    public ResponseEntity<String> deletePost(@PathVariable Long id) {
+        Optional<Post> posts = postRepository.findById(id);
+        if(posts.isPresent()){
+            postRepository.deleteById(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted");
+        }
+        return new ResponseEntity<>("not found",HttpStatus.NOT_FOUND);
     }
 
     //TODO: delete all posts
+    @DeleteMapping("/posts")
     public ResponseEntity<String> deleteAllPosts() {
-        return null;
+        postRepository.deleteAll();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("deleted all");
     }
 
 }
